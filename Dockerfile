@@ -1,11 +1,13 @@
-# Use an official lightweight Nginx image
 FROM nginx:alpine
-
-# Copy your HTML game file into Nginx's public web directory
 COPY index.html /usr/share/nginx/html/index.html
-
-# Expose port 80 to access the game via browser
-EXPOSE 80
-
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+RUN printf 'server {\n\
+  listen 8080;\n\
+  root /usr/share/nginx/html;\n\
+  index index.html;\n\
+  gzip on;\n\
+  gzip_types text/html application/javascript text/css;\n\
+  add_header Cache-Control "no-cache";\n\
+  location / { try_files $uri /index.html; }\n\
+}\n' > /etc/nginx/conf.d/default.conf
+EXPOSE 8080
+CMD ["nginx","-g","daemon off;"]
